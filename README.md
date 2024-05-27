@@ -18,6 +18,7 @@ First, let's get a starting point. Somewhere on your system, run:
 ```bash
 git clone https://github.com/blocky/nitriding
 git checkout 971dd68
+cd nitriding
 dataDir=$(pwd)
 ```
 
@@ -29,9 +30,10 @@ mage source:all
 md5sum ./static/assets/source.tar.gz | awk '{print $1}'
 ```
 
-This will produce `1340160b17e179b9add047aebef13a39`.
+This will produce `737ba8540fcee07cce2bb06cb132f39c`
 
-Second, let's use the `archive` tool to produce the same result.
+Second, let's use the `archive` tool to produce the same result.  From the root
+directory of this project run:
 
 ```bash
 ./archive.sh "$dataDir" "source.tar"
@@ -44,11 +46,11 @@ Let's check the hash of this file:
 md5sum ./source.tar.gz | awk '{print $1}'
 ```
 
-If you got `1340160b17e179b9add047aebef13a39`, then the tool is working as
+If you got `737ba8540fcee07cce2bb06cb132f39c`, then the tool is working as
 expected.
 
 Third, you can run the archive tool via docker. This is useful if you are on a
-Mac (or someother system without the gnu version of tar).  Build the image and
+Mac (or another system without the gnu tar).  Build the image and
 tag it with a useful name
 
 ```bash
@@ -67,7 +69,7 @@ This will create `source-docker.tar.gz` file in the `static/assets` folder of
 ```bash
 md5sum $dataDir/static/assets/source-docker.tar.gz | awk '{print $1}'
 ```
-If you got `1340160b17e179b9add047aebef13a39`, then the tool is working as
+If you got `737ba8540fcee07cce2bb06cb132f39c`, then the tool is working as
 expected.
 
 ## Developing
