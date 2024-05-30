@@ -48,5 +48,5 @@ teardown() {
 
 
     run md5sum "$TMP_DIR/$tarFileName.gz"
-    assert_output --partial "9efc01b2c94118f7901f8df6d78fb2d5"
+    assert_output --partial $want
 }
