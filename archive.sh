@@ -8,9 +8,8 @@ if [ "$#" -ne 2 ]; then
 fi
 
 srcDir=$1
-tarName=$2
-
-dst=$(realpath $tarName)
+dst=$(realpath $2)
+tmpTar=/tmp/nitriding-archive.tar
 
 cd "$srcDir"
 
@@ -24,7 +23,7 @@ tar \
     --owner=0 \
     --group=0 \
     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-    -cf "$dst" \
+    -cf "$tmpTar" \
     ./vendor \
     .
 
@@ -36,7 +35,7 @@ tar \
     --owner=0 \
     --group=0 \
     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-    --file="$dst" \
+    --file="$tmpTar" \
     ./.gitignore
 
-# gzip -nf "$dst"
+LC_ALL=c gzip -cn "$tmpTar" > "$dst"
