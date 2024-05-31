@@ -33,20 +33,23 @@ teardown() {
 
 @test "happy path - expected hash of archive does not change" {
     # the expected hash came from running:
-    # ./archive.sh ./test/test_data/go_proj source.tar && md5sum source.tar.gz
+    #
+    #   docker build -q -t archive . && \
+    #       docker run -v ./test/test_data/go_proj:/src -v .:/dst archive /src /dst/source.tar.gz && \
+    #       md5sum ./source.tar.gz
     #
     # Yes, it does assume that the code is correct.  However, here we are more
-    # concerned with the value changing on systems and not the value itself.
-    # So, if we do run this test and it changes, it indicates there is a
-    # problem on the system.
-    local want="9efc01b2c94118f7901f8df6d78fb2d5"
+    # concerned with the value changing when building on different systems and
+    # not the value itself. So, if we do run this test and it changes, it
+    # indicates there is a problem with some build tool.
+    local want="33779e71960a30046768d235c98ccb48"
 
-    local tarFileName="source.tar"
+    local outFileName="source.tar.gz"
 
-    run archive.sh $DIR/test_data/go_proj/ "$TMP_DIR/$tarFileName"
+    run docker build -q -t archive . && \
+        docker run -v ./test/test_data/go_proj:/src -v $TMP_DIR:/dst archive /src /dst/$outFileName
     assert_success
 
-
-    run md5sum "$TMP_DIR/$tarFileName.gz"
+    run md5sum "$TMP_DIR/$outFileName"
     assert_output --partial $want
 }
