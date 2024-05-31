@@ -18,11 +18,14 @@ tar \
     --exclude-vcs-ignores \
     --exclude "$archiveTarFile" \
     --sort=name \
-    --mtime=@0 \
+    --format=posix \
+    --pax-option='exthdr.name=%d/PaxHeaders/%f' \
+    --pax-option=delete=atime,delete=ctime \
+    --clamp-mtime --mtime=@0 \
     --numeric-owner \
     --owner=0 \
     --group=0 \
-    --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+    --mode='go+u,go-w' \
     -cf "$tmpTar" \
     ./vendor \
     .
@@ -30,11 +33,14 @@ tar \
 tar \
     --append \
     --sort=name \
-    --mtime=@0 \
+    --format=posix \
+    --pax-option='exthdr.name=%d/PaxHeaders/%f' \
+    --pax-option=delete=atime,delete=ctime \
+    --clamp-mtime --mtime=@0 \
     --numeric-owner \
     --owner=0 \
     --group=0 \
-    --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+    --mode='go+u,go-w' \
     --file="$tmpTar" \
     ./.gitignore
 

@@ -42,7 +42,7 @@ teardown() {
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="2a04d67756f2fb8ed95db46a71ef0d76"
+    local want="b9e12d7758a11dd09ec43819523dc9ef"
 
     local outFileName="source.tar.gz"
 
