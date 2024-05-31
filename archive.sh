@@ -39,4 +39,4 @@ tar \
     --file="$dst" \
     ./.gitignore
 
-gzip -nf "$dst"
+# gzip -nf "$dst"
