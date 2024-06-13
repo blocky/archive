@@ -1,21 +1,18 @@
 nix-build-result=result
 output-eif=myeif.eif
-docker-image-name=hello-docker
-docker-image-tag=latest
+# todo update latest to a different tag
+docker-uri=hello-docker:latest
+
+export SOURCE_DATE_EPOCH=0
 
 run:
-	nix-build nix-stuff/docker.nix \
-		--arg appDotNix "./nix-stuff/app.nix" \
-		--argstr cmd "/bin/testproj" \
-		--argstr dockerImageName ${docker-image-name} \
-		--argstr dockerImageTag ${docker-image-tag} \
-		--out-link ${nix-build-result}
-	docker load < ${nix-build-result}
+	docker build --platform linux/amd64 -t ${docker-uri} .
 	docker build -t nitro-cli-image ./nitro-cli/
 	docker run --rm \
 		-v .:/output \
-		-v /var/run/docker.sock:/var/run/docker.sock nitro-cli-image \
-	    nitro-cli build-enclave --docker-uri ${docker-image-name}:${docker-image-tag} --output-file output/${output-eif}
-	rm ${nix-build-result}
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		nitro-cli-image \
+	    nitro-cli build-enclave --docker-uri ${docker-uri} --output-file output/${output-eif}
 clean:
-	rm -f ${nix-build-result} ${output-eif}
+	rm -f ${output-eif}
+
