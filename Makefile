@@ -6,6 +6,7 @@ docker-uri=hello-docker:latest
 export SOURCE_DATE_EPOCH=0
 
 run:
+	echop "building with timestamp: $(SOURCE_DATE_EPOCH)"
 	docker build --platform linux/amd64 -t ${docker-uri} .
 	docker build -t nitro-cli-image ./nitro-cli/
 	docker run --rm \
