@@ -23,6 +23,8 @@ in
   # Do not user cgo
   CGO_ENABLED = 0;
 
+  buildflags = [ "-trimpath" ];
+
   # I am still trying to figure out what this really does. In general, when it
   # is set to false, the check phase of building is skipped.  From a few
   # non-authoritative sources, it seems that the do check for go building is
