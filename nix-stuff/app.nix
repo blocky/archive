@@ -1,9 +1,13 @@
-{ pkgs ? import <nixpkgs> {} }:
+{
+    pkgs ? import <nixpkgs> {},
+    os ? "linux",
+    arch ? "amd64",
+}:
 let
     buildGoModule = pkgs.buildGoModule;
     lib = pkgs.lib;
 in
-buildGoModule rec {
+(buildGoModule rec {
   pname = "go-proj";
   version = "v0.0.1";
 
@@ -21,6 +25,9 @@ buildGoModule rec {
   # vendor should always be set to null
   vendorHash = null;
 
+  # Do not user cgo
+  CGO_ENABLED = 0;
+
   # I am still trying to figure out what this really does. In general, when it
   # is set to false, the check phase of building is skipped.  From a few
   # non-authoritative sources, it seems that the do check for go building is
@@ -34,4 +41,4 @@ buildGoModule rec {
     license = licenses.mit;
     platforms = platforms.unix;
   };
-}
+}).overrideAttrs( old: old // { GOOS = os; GOARCH = arch; } )
