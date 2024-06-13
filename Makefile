@@ -6,7 +6,7 @@ docker-image-tag=latest
 run:
 	nix-build nix-stuff/docker.nix \
 		--arg appDotNix "./nix-stuff/app.nix" \
-		--argstr cmd "/bin/testproj" \
+		--argstr cmd "/bin/go-proj" \
 		--argstr dockerImageName ${docker-image-name} \
 		--argstr dockerImageTag ${docker-image-tag} \
 		--out-link ${nix-build-result}
@@ -17,5 +17,6 @@ run:
 		-v /var/run/docker.sock:/var/run/docker.sock nitro-cli-image \
 	    nitro-cli build-enclave --docker-uri ${docker-image-name}:${docker-image-tag} --output-file output/${output-eif}
 	rm ${nix-build-result}
+	docker run --rm ${docker-image-name}:${docker-image-tag}
 clean:
 	rm -f ${nix-build-result} ${output-eif}
