@@ -1,10 +1,5 @@
-{
-    pkgs ? import <nixpkgs> {},
-    os ? "linux",
-    arch ? "amd64",
-}:
-let
-    buildGoModule = pkgs.buildGoModule;
+{ pkgs ? import <nixpkgs> {} }:
+let buildGoModule = pkgs.buildGoModule;
     lib = pkgs.lib;
 in
 (buildGoModule rec {
@@ -41,4 +36,4 @@ in
     license = licenses.mit;
     platforms = platforms.unix;
   };
-}).overrideAttrs( old: old // { GOOS = os; GOARCH = arch; } )
+})
