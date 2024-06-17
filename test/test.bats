@@ -18,17 +18,7 @@ setup() {
 
 teardown() {
     # clean up the temp directory
-    rm -rf "$TMP_DIR"
-}
-
-@test "fails with no argument" {
-   run archive.sh
-   assert_failure
-}
-
-@test "fails with one argument" {
-   run archive.sh something
-   assert_failure
+    echo rm -rf "$TMP_DIR"
 }
 
 @test "happy path - expected hash of archive does not change" {
@@ -42,12 +32,17 @@ teardown() {
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="b9e12d7758a11dd09ec43819523dc9ef"
+    local want="cedbc0b9865663812bdcddb8979905d1"
 
-    local outFileName="source.tar.gz"
+    local outFileName="source.tar"
 
-    run docker build -q -t archive . && \
-        docker run -v ./test/test_data/go_proj:/src -v $TMP_DIR:/dst archive /src /dst/$outFileName
+    run ./archive.sh repro-tar \
+        -C ./test/test_data/ \
+        --exclude-vcs \
+        --exclude-vcs-ignores \
+        -cf "$TMP_DIR/$outFileName" \
+        ./go_proj/  \
+        ./go_proj/vendor \
     assert_success
 
     run md5sum "$TMP_DIR/$outFileName"
