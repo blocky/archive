@@ -9,24 +9,12 @@ setup() {
     DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" >/dev/null 2>&1 && pwd )"
     # make executables in src/ visible to PATH
     PATH="$DIR/..:$PATH"
-
-    # setup the temp directory for testing
-    # make sure this is cleaned up in the teardown!!
-    TMP_DIR=/tmp/archive-test-dir
-    mkdir -p "$TMP_DIR"
-}
-
-teardown() {
-    # clean up the temp directory
-    echo rm -rf "$TMP_DIR"
 }
 
 @test "happy path - expected hash of archive does not change" {
     # the expected hash came from running:
     #
-    #   docker build -q -t archive . && \
-    #       docker run -v ./test/test_data/go_proj:/src -v .:/dst archive /src /dst/source.tar.gz && \
-    #       md5sum ./source.tar.gz
+    #   ./archive.sh repro-tar -C ./test/test_data/ --exclude-vcs --exclude-vcs-ignores -c ./go_proj/ ./go_proj/vendor | md5sum
     #
     # Yes, it does assume that the code is correct.  However, here we are more
     # concerned with the value changing when building on different systems and
@@ -34,17 +22,22 @@ teardown() {
     # indicates there is a problem with some build tool.
     local want="cedbc0b9865663812bdcddb8979905d1"
 
-    local outFileName="source.tar"
-
-    run ./archive.sh repro-tar \
+    got=$(./archive.sh repro-tar \
+        `# use the test data directory as the base directory` \
         -C ./test/test_data/ \
+        `# exclude the .git and other git related files, e.g. .gitignore` \
         --exclude-vcs \
+        `# exclude anything that would be ignored by git` \
         --exclude-vcs-ignores \
-        -cf "$TMP_DIR/$outFileName" \
+        `# create an archive` \
+        -c \
+        `# add the directories to the archive` \
         ./go_proj/  \
         ./go_proj/vendor \
-    assert_success
+        `# compute the hash of the archive` \
+        | md5sum)
 
-    run md5sum "$TMP_DIR/$outFileName"
+    # to test, echo the value that we got and see if it what we wanted
+    run echo "$got"
     assert_output --partial $want
 }

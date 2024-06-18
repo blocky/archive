@@ -4,9 +4,32 @@ The larger goal of this project is to provide a way to produce byte-for-byte
 identical archives independent of the platform on which the archive is
 created.
 
-Currently, however, it is highly opinionated in that it only supports go
-projects that use `git` for source control management and have its dependencies
-in the `vendor` folder.
+Currently, however, it is highly opinionated in that it only supports working
+in the shell described by `shell.nix` for a go project that has its
+dependencies in the `vendor` folder.
+
+## Getting started
+
+Install the nix package manager on your system. See
+[download](https://nixos.org/download/) for more info.  Note that while it does
+take you to NixOS, this site just installs the package manager. You do NOT need
+to run the OS.
+
+
+## Getting started developing
+
+Testing is done with [bats](https://bats-core.readthedocs.io).  Bats is set up
+as a submodule, so you can get it set up with:
+
+```bash
+git submodule update --init
+```
+
+You can run the tests with
+
+```bash
+make test
+```
 
 ## Example usage
 
