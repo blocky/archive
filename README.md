@@ -1,11 +1,10 @@
 # archive
 
 The larger goal of this project is to provide a way to produce byte-for-byte
-identical archives independent of the platform on which the archive is
-created.
+identical archives independent of the platform on which the archive is created.
 
 Currently, however, it is highly opinionated in that it only supports working
-in the shell described by `shell.nix` for a go project that has its
+in `nix shell`  go project that has its
 dependencies in the `vendor` folder.
 
 ## Getting started
@@ -26,6 +25,22 @@ git submodule update --init
 ```
 
 You can run the tests with
+
+```bash
+make test
+```
+
+You will likely observe that the tests fail.  That is because, you will
+need to run in a nix shell for everything to be reproducible.
+
+To start a pure nix shell (that is, none of your host's environment will leak
+into the shell) run:
+
+```bash
+nix-shell --pure
+```
+
+And now, the tests should succeed
 
 ```bash
 make test
