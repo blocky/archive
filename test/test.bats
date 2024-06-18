@@ -11,6 +11,20 @@ setup() {
     PATH="$DIR/..:$PATH"
 }
 
+@test "terminates when not in nix shell" {
+    # in this test, we set the environment variable to something different
+    # than what the nix shell expected
+    run bash -c 'IN_NIX_SHELL=nope ./archive.sh help'
+    assert_failure
+}
+
+@test "warns when not in nix shell but running unsafe" {
+    # in this test, we set the environment variable to something different
+    # than what the nix shell expected
+    run bash -c 'IN_NIX_SHELL=nope ./archive.sh --unsafe help'
+    assert_output --partial "WARNING"
+}
+
 @test "happy path - expected hash of archive does not change" {
     # the expected hash came from running:
     #
