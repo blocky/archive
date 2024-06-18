@@ -33,7 +33,11 @@ function sub_repro-tar(){
     # A set of arguments for tar that will create reproducible archives.
     # For more on what these do and how they work see:
     #   https://www.gnu.org/software/tar/manual/html_node/Reproducibility.html
-    LC_ALL=c tar \
+    #
+    # One difference is that here, we do not set LC_ALL=C. From what I
+    # understand, since nix controls the locals it should not be set by the
+    # command.
+    tar \
         --sort=name \
         --format=posix \
         --pax-option='exthdr.name=%d/PaxHeaders/%f' \
@@ -47,8 +51,15 @@ function sub_repro-tar(){
         $@
 }
 
-sub_gzip(){
-    LC_ALL=c gzip --no-name
+sub_repro-gzip(){
+    # A set of arguments for gzip that will create reproducible zips.
+    # For more on what these do and how they work see:
+    #   https://www.gnu.org/software/tar/manual/html_node/Reproducibility.html
+    #
+    # One difference is that here, we do not set LC_ALL=C. From what I
+    # understand, since nix controls the locals it should not be set by the
+    # command.
+    gzip --no-name $@
 }
 
 subcommand=$1

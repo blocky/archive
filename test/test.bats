@@ -41,3 +41,29 @@ setup() {
     run echo "$got"
     assert_output --partial $want
 }
+
+@test "happy path - expected hash of zipfile does not change" {
+    # the expected hash came from running:
+    #
+    #   ./archive.sh repro-gzip --best -c ./test/test_data/go_proj/main.go | md5sum
+    #
+    # Yes, it does assume that the code is correct.  However, here we are more
+    # concerned with the value changing when building on different systems and
+    # not the value itself. So, if we do run this test and it changes, it
+    # indicates there is a problem with some build tool.
+    local want="8b4c32449a7bf5008400569662ccc43e"
+
+    got=$(./archive.sh repro-gzip \
+        `# use the best compression at the expense of time to compress` \
+        --best \
+        `# write the output to stdout` \
+        -c \
+        `# specify the file to gzip` \
+        ./test/test_data/go_proj/main.go \
+        `# compute the hash of the gzip file` \
+        | md5sum)
+
+    # to test, echo the value that we got and see if it what we wanted
+    run echo "$got"
+    assert_output --partial $want
+}
