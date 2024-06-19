@@ -6,5 +6,7 @@ in
 pkgs.mkShellNoCC {
   packages = with pkgs; [
     docker
+    git
+    nix
   ];
 }

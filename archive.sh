@@ -3,9 +3,9 @@
 set -e
 
 function sub_help() {
-    local appName=$1
+    local app_name="$1"
 
-    echo "Usage: $appName [-u|--unsafe] <subcommand> [options]"
+    echo "Usage: $app_name [-u|--unsafe] <subcommand> [options]"
     echo ""
     echo "Flags:"
     echo "    -h, --help    Display the help message."
@@ -19,7 +19,7 @@ function sub_help() {
     echo "                Additional options are passed through to the tar command."
     echo ""
     echo "For help with each subcommand run:"
-    echo "$appName <subcommand> -h|--help"
+    echo "$app_name <subcommand> -h|--help"
 }
 
 function sub_repro-tar() {
@@ -28,7 +28,6 @@ function sub_repro-tar() {
     # for more on this environment variable see:
     #   https://reproducible-builds.org/docs/timestamps/
     mtime=${SOURCE_DATE_EPOCH:=0}
-
 
     # A set of arguments for tar that will create reproducible archives.
     # For more on what these do and how they work see:
@@ -62,8 +61,38 @@ function sub_repro-gzip() {
     gzip --no-name $@
 }
 
+function sub_package() {
+    src=$1
+    cmd=$2
+
+    local tmp_dir="/tmp/archive_package/"
+    mkdir -p $tmp_dir
+
+    local out_link="$tmp_dir/result"
+    local app_image="archive-package"
+	nix-build docker.nix \
+		--arg appDotNix "./go.nix" \
+		--argstr cmd "$cmd" \
+		--argstr imageName "$app_image" \
+        --arg src "$src" \
+		--out-link "$out_link"
+	docker load < "$out_link"
+
+    local nitro_cli_image="nitro-cli-image"
+	docker build -t "$nitro_cli_image" -f ./nitro-cli.dockerfile .
+	docker run --rm \
+		-v $tmp_dir:/output \
+		-v /var/run/docker.sock:/var/run/docker.sock "$nitro_cli_image" \
+	    nitro-cli build-enclave --docker-uri "$app_image" --output-file output/myEif.eif
+
+	# rm ${nix-build-result}
+	docker run --rm "$app_image"
+    # copy the eif to the ouput
+}
+
+
 function check_platform() {
-    local allowUncheckedPlatform=$1
+    local allow_unchecked_platform="$1"
     local abort=false
 
     YELLOW='\033[0;33m'
@@ -72,7 +101,7 @@ function check_platform() {
 
     # check if we are running in nix-shell
     if [[ $IN_NIX_SHELL != "pure" ]]; then
-        if $allowUncheckedPlatform; then
+        if $allow_unchecked_platform; then
             echo -e ${YELLOW}
             echo "WARNING:"
         else
@@ -91,7 +120,7 @@ function check_platform() {
     # check if we are running on x86_64
     local arch=$(uname -m)
     if [[ $arch != "x86_64" ]]; then
-        if $allowUncheckedPlatform; then
+        if $allow_unchecked_platform; then
             echo -e ${YELLOW}
             echo "WARNING:"
         else
@@ -113,40 +142,44 @@ function check_platform() {
         echo "    If you really want to run this application, "
         echo "    consider using the '--unsafe' flag."
         echo "    For example:"
-        echo "        '$appName --unsafe help'"
+        echo "        '$app_name --unsafe help'"
         exit 1
     fi
 }
 
-# General structure for handling bash subscommands
-# was prposed by waylan in the following gist:
-# https://gist.github.com/waylan/4080362
-appName=$(basename $0)
+function main() {
+    # General structure for handling bash subscommands
+    # was prposed by waylan in the following gist:
+    # https://gist.github.com/waylan/4080362
+    app_name=$(basename $0)
 
-# this value controls whether we error or warn on a platform that
-# is not supported.
-allowUncheckedPlatform=false
+    # this value controls whether we error or warn on a platform that
+    # is not supported.
+    allow_unchecked_platform=false
 
-while true; do
-    opt=$1
-    case $opt in
-        "" | "-h" | "--help")
-            sub_help $appName
-            ;;
-        "-u" | "--unsafe")
-            shift
-            allowUncheckedPlatform=true
-            ;;
-        *)
-            shift
-            check_platform $allowUncheckedPlatform
-            sub_${opt} $@
-            if [ $? = 127 ]; then
-                echo "Error: '$subcommand' is not a known subcommand." >&2
-                echo "       Run '$appName --help' for a list of known subcommands." >&2
-                exit 1
-            fi
-            exit 0
-            ;;
-    esac
-done
+    while true; do
+        opt=$1
+        case $opt in
+            "" | "-h" | "--help")
+                sub_help $app_name
+                ;;
+            "-u" | "--unsafe")
+                shift
+                allow_unchecked_platform=true
+                ;;
+            *)
+                shift
+                check_platform $allow_unchecked_platform
+                sub_${opt} $@
+                if [ $? = 127 ]; then
+                    echo "Error: '$subcommand' is not a known subcommand." >&2
+                    echo "       Run '$app_name --help' for a list of known subcommands." >&2
+                    exit 1
+                fi
+                exit 0
+                ;;
+        esac
+    done
+}
+
+main "$@"
