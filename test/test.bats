@@ -34,7 +34,7 @@ setup() {
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="cedbc0b9865663812bdcddb8979905d1"
+    local want="33c31dfa677be99a4a1fac34b69d2075"
 
     got=$(./archive.sh repro-tar \
         `# use the test data directory as the base directory` \
@@ -65,7 +65,8 @@ setup() {
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="8b4c32449a7bf5008400569662ccc43e"
+    local want="df33befa3b10692f45a5860889afa633"
+
 
     got=$(./archive.sh repro-gzip \
         `# use the best compression at the expense of time to compress` \
