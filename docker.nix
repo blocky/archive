@@ -6,6 +6,7 @@ let
 in
 pkgs.dockerTools.buildImage {
     name = "${imageName}";
+    tag = "latest";
     copyToRoot = [ aPkg ];
 
     config = {

@@ -70,23 +70,27 @@ function sub_package() {
 
     local out_link="$tmp_dir/result"
     local app_image="archive-package"
+    local app_image_tag="latest"
 	nix-build docker.nix \
 		--arg appDotNix "./go.nix" \
 		--argstr cmd "$cmd" \
 		--argstr imageName "$app_image" \
+        --argstr imageTag "$app_image_tag" \
         --arg src "$src" \
 		--out-link "$out_link"
 	docker load < "$out_link"
 
     local nitro_cli_image="nitro-cli-image"
 	docker build -t "$nitro_cli_image" -f ./nitro-cli.dockerfile .
+
+    local app_image_uri="${app_image}:${app_image_tag}"
 	docker run --rm \
 		-v $tmp_dir:/output \
 		-v /var/run/docker.sock:/var/run/docker.sock "$nitro_cli_image" \
-	    nitro-cli build-enclave --docker-uri "$app_image" --output-file output/myEif.eif
+	    nitro-cli build-enclave --docker-uri "${app_image_uri}" --output-file output/myEif.eif
 
 	# rm ${nix-build-result}
-	docker run --rm "$app_image"
+	docker run --rm "$app_image_uri"
     # copy the eif to the ouput
 }
 

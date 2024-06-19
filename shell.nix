@@ -5,6 +5,7 @@ in
 
 pkgs.mkShellNoCC {
   packages = with pkgs; [
+    cacert
     docker
     git
     nix
