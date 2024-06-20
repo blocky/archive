@@ -1,5 +1,11 @@
 #!/bin/env bash
 
+##!/usr/bin/env nix-shell
+#! nix-shell -i bash --pure
+#! nix-shell -p bash mustache-go
+#! nix-shell -I nixpkgs=https://...<TODO>
+
+
 set -e
 
 function sub_help() {
@@ -13,6 +19,8 @@ function sub_help() {
     echo ""
     echo "Subcommands:"
     echo "    help        Display the help message."
+    echo "    package     Package for building for enclaves."
+    echo "    go-proj     Archive a vendored go project maintained by git."
     echo "    repro-tar   tar with flags set for creating archives reproducibly."
     echo "                Additional options are passed through to the tar command."
     echo "    repro-gzip  gzip with flags set for compressing archives reproducibly."
@@ -61,37 +69,64 @@ function sub_repro-gzip() {
     gzip --no-name $@
 }
 
+function sub_go-proj() {
+    local root_dir=$1
+    local proj_dir=$2
+
+    ./archive.sh repro-tar \
+            -C "$root_dir" \
+            --exclude-vcs \
+            --exclude-vcs-ignores \
+            -c \
+            "$proj_dir" \
+            "$proj_dir/vendor" |
+        ./archive.sh repro-gzip -c --best
+}
+
 function sub_package() {
-    src=$1
-    cmd=$2
+    local dst=$1
+    local src=$2
+    local root_dir_name=$3
+    shift 3
+    local cmd=$@
 
-    local tmp_dir="/tmp/archive_package/"
-    mkdir -p $tmp_dir
+    local tmp_dir=$(mktemp -d -t archive-package.XXXXXX)
+    local staging_dir="$tmp_dir/$root_dir_name"
 
-    local out_link="$tmp_dir/result"
-    local app_image="archive-package"
-    local app_image_tag="latest"
-	nix-build docker.nix \
-		--arg appDotNix "./go.nix" \
-		--argstr cmd "$cmd" \
-		--argstr imageName "$app_image" \
-        --argstr imageTag "$app_image_tag" \
-        --arg src "$src" \
-		--out-link "$out_link"
-	docker load < "$out_link"
+    # copy the boring templates
+    local to_copy=( "docker.nix" "go.nix" "nitro-cli.dockerfile" )
+    for f in "${to_copy[@]}"; do
+        install -D "./templates/$f" "$staging_dir/$f"
+    done
 
-    local nitro_cli_image="nitro-cli-image"
-	docker build -t "$nitro_cli_image" -f ./nitro-cli.dockerfile .
+    # render the more interesting templates
+    echo CMD: "$cmd" | mustache ./templates/Makefile.mustache > "$staging_dir/Makefile"
 
-    local app_image_uri="${app_image}:${app_image_tag}"
-	docker run --rm \
-		-v $tmp_dir:/output \
-		-v /var/run/docker.sock:/var/run/docker.sock "$nitro_cli_image" \
-	    nitro-cli build-enclave --docker-uri "${app_image_uri}" --output-file output/myEif.eif
+    # copy the source code
+    local ext=$(echo "${src##*.}")
+    cp -r "$src" "$staging_dir/src.$ext"
 
-	# rm ${nix-build-result}
-	docker run --rm "$app_image_uri"
-    # copy the eif to the ouput
+    # set everything to the right permissions
+    chmod -R 644 $staging_dir/*
+
+    # create the archive
+    sub_repro-tar -c -C "$tmp_dir" "$root_dir_name" | \
+        sub_repro-gzip -c --best > "$tmp_dir/$root_dir_name.tar.gz"
+
+    # clean up
+    rm -rf $staging_dir
+
+    # now we build our artifacts from the archive
+    (cd $tmp_dir && \
+        tar xzf "$root_dir_name.tar.gz" && \
+        make -C "$root_dir_name" && \
+        mv "$root_dir_name.tar.gz" "$root_dir_name/output/")
+
+    # and put them in the final destination
+    mv "$tmp_dir/$root_dir_name/output" $dst
+
+    # clean up
+    rm -rf $tmp_dir
 }
 
 

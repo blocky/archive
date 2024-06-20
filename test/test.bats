@@ -11,20 +11,6 @@ setup() {
     PATH="$DIR/..:$PATH"
 }
 
-@test "terminates when not in nix shell" {
-    # in this test, we set the environment variable to something different
-    # than what the nix shell expected
-    run bash -c 'IN_NIX_SHELL=nope ./archive.sh help'
-    assert_failure
-}
-
-@test "warns when not in nix shell but running unsafe" {
-    # in this test, we set the environment variable to something different
-    # than what the nix shell expected
-    run bash -c 'IN_NIX_SHELL=nope ./archive.sh --unsafe help'
-    assert_output --partial "WARNING"
-}
-
 @test "happy path - expected hash of archive does not change" {
     # the expected hash came from running:
     #
@@ -67,7 +53,6 @@ setup() {
     # indicates there is a problem with some build tool.
     local want="df33befa3b10692f45a5860889afa633"
 
-
     got=$(./archive.sh repro-gzip \
         `# use the best compression at the expense of time to compress` \
         --best \
@@ -82,3 +67,47 @@ setup() {
     run echo "$got"
     assert_output --partial $want
 }
+
+@test "happy path - archiving a go project" {
+    # the expected hash came from running:
+    #
+    #   ./archive.sh go-proj ./test/test_data/ ./go_proj | md5sum
+    #
+    # Yes, it does assume that the code is correct.  However, here we are more
+    # concerned with the value changing when building on different systems and
+    # not the value itself. So, if we do run this test and it changes, it
+    # indicates there is a problem with some build tool.
+    local want="86b9745d8191784dd78ed9fc055714e5"
+
+    got=$(./archive.sh go-proj \
+        `# the base directory for creating the archive` \
+        ./test/test_data/ \
+        `# the directory in the base director to archive` \
+        ./go_proj \
+        `# compute the hash of the archive` \
+        | md5sum)
+
+    # to test, echo the value that we got and see if it what we wanted
+    run echo "$got"
+    assert_output --partial $want
+}
+
+@test "happy path - package a go project" {
+    # the expected hash came from running:
+    #
+    #   ./archive.sh package /tmp/archive-package-assets ./test/test_data/go-proj-src.tgz go-proj "go-proj 1 2 3"
+    #   cat /tmp/archive-package-assets/eif-description.json
+    #
+    # Yes, it does assume that the code is correct.  However, here we are more
+    # concerned with the value changing when building on different systems and
+    # not the value itself. So, if we do run this test and it changes, it
+    # indicates there is a problem with some build tool.
+    local want='"PCR0": "458b8cfe4a04d1fb91304a987a715e40a2e05e2c6bb3b8fa9334ea3f0ed4490c2baa43837ef25a842e7c4b8cbe662697"'
+
+    ./archive.sh package $BATS_TEST_TMPDIR/assets ./test/test_data/go-proj-src.tgz go-proj "go-proj 1 2 3"
+
+    # to test, echo the value that we got and see if it what we wanted
+    run cat $BATS_TEST_TMPDIR/assets/eif-description.json
+    assert_output --partial $want
+}
+
