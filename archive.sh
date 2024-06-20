@@ -1,7 +1,7 @@
 #!/usr/bin/env nix-shell
 #! nix-shell -i bash --pure
 #! nix-shell -p bash mustache-go nix cacert docker
-#! nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs/tarball/nixos-23.11
+#! nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs/tarball/nixos-24.05
 
 set -e
 
