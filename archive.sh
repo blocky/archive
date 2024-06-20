@@ -1,10 +1,7 @@
-#!/bin/env bash
-
-##!/usr/bin/env nix-shell
+#!/usr/bin/env nix-shell
 #! nix-shell -i bash --pure
-#! nix-shell -p bash mustache-go
-#! nix-shell -I nixpkgs=https://...<TODO>
-
+#! nix-shell -p bash mustache-go nix cacert docker
+#! nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs/tarball/nixos-23.11
 
 set -e
 
