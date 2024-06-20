@@ -32,6 +32,7 @@ nix-shell -p go git
 git clone https://github.com/blocky/set-get
 cd set-get
 go mod vendor
+exit
 ```
 
 Here, we will assume that the project is in the `set-get` directory next to the
@@ -46,6 +47,7 @@ Next, we can run the archive command to produce a gzipped tarball of the
 set-get project.
 
 ```bash
+cd archive
 ./archive.sh go-proj ../set-get > /tmp/set-get-src.tgz
 ```
 
@@ -60,32 +62,32 @@ that acts as a way to build the EIF file, and archive the source so that one
 can compute PCR0s in the future.
 
 ```bash
-./archive.sh package ../assets /tmp/set-get-src.tgz set-get "gateway"
+./archive.sh package /tmp/set-get-assets /tmp/set-get-src.tgz set-get "gateway"
 ```
 
 Let's break this down:
 * `./archive.sh package` runs the subcommand
-* `../assets` is the place where we will place our outputs, note that we assume
+* `/tmp/set-get-assets` is the place where we will place our outputs. We assume
   that the directory does not yet exist
 * `/tmp/set-get-src.tgz` is the source archive.  We created that in the
   previous step.
 * `set-get` is the name of the project
 * `gateway` is the name of the program created by the project.  That is, it is
   the name of the program created by running `go install .` in the project
-  directory.  You can find it in the go.mod file.
+  directory.  You can find that info in the go.mod file.
 
-Once this runs, all of your assets will be in the `../assets` directory.
+Once this runs, all of your assets will be in the `/tmp/set-get-assets` directory.
 
 And for the big finish, you can "verify" this archive as follows:
 
 ```bash
-cd ../assets
-tar -xzf set-get.tar.gz
+cd /tmp/set-get-assets
+tar xzf set-get.tar.gz
 cd set-get
 make
 ```
 The `output` folder will hold the eif file and the `eif-description.json` file.
-You can find the PCR0 from the desciption as follows:
+You can find the PCR0 from the description as follows:
 
 ```bash
 cd ouput
