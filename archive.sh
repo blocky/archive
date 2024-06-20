@@ -67,16 +67,18 @@ function sub_repro-gzip() {
 }
 
 function sub_go-proj() {
-    local root_dir=$1
-    local proj_dir=$2
+    local go_proj_dir=$1
+
+    local proj_name=$(basename $go_proj_dir)
+    local root_dir=$(dirname $go_proj_dir)
 
     ./archive.sh repro-tar \
             -C "$root_dir" \
             --exclude-vcs \
             --exclude-vcs-ignores \
             -c \
-            "$proj_dir" \
-            "$proj_dir/vendor" |
+            "./$proj_name" \
+            "./$proj_name/vendor" |
         ./archive.sh repro-gzip -c --best
 }
 

@@ -71,19 +71,17 @@ setup() {
 @test "happy path - archiving a go project" {
     # the expected hash came from running:
     #
-    #   ./archive.sh go-proj ./test/test_data/ ./go_proj | md5sum
+    #   ./archive.sh go-proj ./test/test_data/go_proj | md5sum
     #
     # Yes, it does assume that the code is correct.  However, here we are more
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="86b9745d8191784dd78ed9fc055714e5"
+    local want="d41d8cd98f00b204e9800998ecf8427e"
 
     got=$(./archive.sh go-proj \
-        `# the base directory for creating the archive` \
-        ./test/test_data/ \
-        `# the directory in the base director to archive` \
-        ./go_proj \
+        `# the directory containing the go project` \
+        ./test/test_data/go_proj |
         `# compute the hash of the archive` \
         | md5sum)
 
