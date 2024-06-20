@@ -54,8 +54,8 @@ cd archive
 Let's break this down:
 
 * `./archive.sh go-proj` runs the subcommand
-* `../set-get` is the path to the `set-get` project > /tmp/src.tgz
-* `> /tmp/src.tgz` outputs the gzipped tarball to `/tmp/src.tgz`
+* `../set-get` is the path to the `set-get` project > /tmp/set-get-src.tgz
+* `> /tmp/set-get-src.tgz` outputs the gzipped tarball to `/tmp/set-get-src.tgz`
 
 Now that we have an archive, we can use the other command to create a package
 that acts as a way to build the EIF file, and archive the source so that one
@@ -109,88 +109,26 @@ You can run the tests with
 make test
 ```
 
-You will likely observe that the tests fail.  That is because, you will
-need to run in a nix shell for everything to be reproducible.
-
-To start a pure nix shell (that is, none of your host's environment will leak
-into the shell) run:
-
-```bash
-nix-shell --pure
-```
-
-And now, the tests should succeed
+You will likely observe that starting the application is kind of slow.  This is
+because each run of the `archive.sh` script will start a `nix-shell`.  There is
+likely a better way, but at least one thing that helps is you can speed up
+development by starting a `nix-shell`, updating the script and developing the
+script in the `nix-shell`.  For example
 
 ```bash
-make test
+nix-shell --pure -p bash docker mustache-go nix
 ```
 
-## Example usage
+And then go to `archive.sh` add a "normal" bash shebang. That is, apply the
+following patch (just make sure to remove it before committing):
 
-We provide two examples of how to use this tool to generate a gzipped
-tarball of a specific commit of a project.
-
-First, let's get a starting point. Somewhere on your system, run:
-
-```bash
-git clone https://github.com/blocky/nitriding
-git checkout 971dd68
-cd nitriding
-dataDir=$(pwd)
 ```
-
-After appropriate setup for nitriding, we can find the expected `md5sum` of the
-gzipped tarball using the following commands:
-
-```bash
-mage source:all
-md5sum ./static/assets/source.tar.gz | awk '{print $1}'
+--- a/archive.sh
++++ b/archive.sh
+@@ -1,3 +1,5 @@
++#!/usr/bin/env bash
++
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash --pure
+#! nix-shell -p bash mustache-go nix cacert docker
 ```
-
-This will produce `737ba8540fcee07cce2bb06cb132f39c`
-
-Second, let's use the `archive` tool to produce the same result.  From the root
-directory of this project run:
-
-```bash
-./archive.sh "$dataDir" "source.tar"
-```
-
-This will create a gzipped tarball current directory called `source.tar.gz`.
-Let's check the hash of this file:
-
-```bash
-md5sum ./source.tar.gz | awk '{print $1}'
-```
-
-If you got `737ba8540fcee07cce2bb06cb132f39c`, then the tool is working as
-expected.
-
-Third, you can run the archive tool via docker. This is useful if you are on a
-Mac (or another system without the gnu tar).  Build the image and
-tag it with a useful name
-
-```bash
-docker build -t archive .
-```
-
-Run the image mapping `$dataDir` (from the host) to `/data` (in the container):
-
-```bash
-docker run -v $dataDir:/data archive /data /data/static/assets/source-docker.tar
-```
-
-This will create `source-docker.tar.gz` file in the `static/assets` folder of
-`$dataDir`. We can check that the hash of this file as well:
-
-```bash
-md5sum $dataDir/static/assets/source-docker.tar.gz | awk '{print $1}'
-```
-If you got `737ba8540fcee07cce2bb06cb132f39c`, then the tool is working as
-expected.
-
-## Developing
-
-While there is really not much to this project, it was helpful to use
-[bats](https://bats-core.readthedocs.io) to get everything going and so I left
-it in the project to aid in later development, should we need more.
