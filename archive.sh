@@ -80,6 +80,16 @@ function sub_go-proj() {
 }
 
 function sub_package() {
+    if [[ $# -ne 4 ]]; then
+        echo "Usage: $0 package <dst> <src> <name> <cmd>"
+        echo ""
+        echo "    dst  Output directory. We assume it does not already exist"
+        echo "    src  Source archive (created with go-proj subcommand)"
+        echo "    name Name of the project"
+        echo "    cmd  Name of the program created by the project"
+        exit 1
+    fi
+
     local dst=$1
     local src=$2
     local root_dir_name=$3
