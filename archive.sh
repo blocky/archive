@@ -200,6 +200,7 @@ function main() {
         case $opt in
             "" | "-h" | "--help")
                 sub_help $app_name
+                exit 0
                 ;;
             "-u" | "--unsafe")
                 shift
