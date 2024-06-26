@@ -81,7 +81,6 @@ function sub_go-proj() {
 
 function sub_package() {
     if [[ $# -lt 4 ]]; then
-        local subcommand=$(echo $FUNCNAME | cut -d '_' -f 2)
         echo "Usage: $0 package <dst> <src> <name> <cmd>"
         echo ""
         echo "    dst  Output directory. We assume it does not already exist"
