@@ -22,9 +22,6 @@ function sub_help() {
     echo "                Additional options are passed through to the tar command."
     echo "    repro-gzip  gzip with flags set for compressing archives reproducibly."
     echo "                Additional options are passed through to the tar command."
-    echo ""
-    echo "For help with each subcommand run:"
-    echo "$app_name <subcommand> -h|--help"
 }
 
 function sub_repro-tar() {
