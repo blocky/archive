@@ -100,12 +100,12 @@ setup() {
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want='"PCR0": "458b8cfe4a04d1fb91304a987a715e40a2e05e2c6bb3b8fa9334ea3f0ed4490c2baa43837ef25a842e7c4b8cbe662697"'
+    local want="0ede36621dee8727d23cd03a3b2c464f7e4c0d3e7c17f026db7304b94ebec30ec725436ea7fa1ebc163ac41ab05383d2"
 
     ./archive.sh package $BATS_TEST_TMPDIR/assets ./test/test_data/go-proj-src.tgz go-proj "go-proj 1 2 3"
 
     # to test, echo the value that we got and see if it what we wanted
-    run cat $BATS_TEST_TMPDIR/assets/eif-description.json
+    run jq .Measurements.PCR0 $BATS_TEST_TMPDIR/assets/eif-description.json
     assert_output --partial $want
 }
 
