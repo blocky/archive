@@ -102,10 +102,17 @@ setup() {
     # indicates there is a problem with some build tool.
     local want="0ede36621dee8727d23cd03a3b2c464f7e4c0d3e7c17f026db7304b94ebec30ec725436ea7fa1ebc163ac41ab05383d2"
 
-    ./archive.sh package $BATS_TEST_TMPDIR/assets ./test/test_data/go-proj-src.tgz go-proj "go-proj 1 2 3"
+    ./archive.sh package $BATS_TEST_TMPDIR/assets3Args ./test/test_data/go-proj-src.tgz go-proj "go-proj 1 2 3"
 
-    # to test, echo the value that we got and see if it what we wanted
-    run jq .Measurements.PCR0 $BATS_TEST_TMPDIR/assets/eif-description.json
+    # to test, extract the PCR0
+    run jq .Measurements.PCR0 $BATS_TEST_TMPDIR/assets3Args/eif-description.json
     assert_output --partial "$want"
+
+    # and we test that the PCR0 value changes if we change the "run string"
+    ./archive.sh package $BATS_TEST_TMPDIR/assets5Args ./test/test_data/go-proj-src.tgz go-proj "go-proj 1 2 3 4 5"
+
+    # again extract the PCR0
+    run jq .Measurements.PCR0 $BATS_TEST_TMPDIR/assets5Args/eif-description.json
+    refute_output --partial "$want"
 }
 
