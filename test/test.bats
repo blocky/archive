@@ -39,7 +39,7 @@ setup() {
 
     # to test, echo the value that we got and see if it what we wanted
     run echo "$got"
-    assert_output --partial $want
+    assert_output --partial "$want"
 }
 
 @test "happy path - expected hash of zipfile does not change" {
@@ -65,7 +65,7 @@ setup() {
 
     # to test, echo the value that we got and see if it what we wanted
     run echo "$got"
-    assert_output --partial $want
+    assert_output --partial "$want"
 }
 
 @test "happy path - archiving a go project" {
@@ -87,7 +87,7 @@ setup() {
 
     # to test, echo the value that we got and see if it what we wanted
     run echo "$got"
-    assert_output --partial $want
+    assert_output --partial "$want"
 }
 
 @test "happy path - package a go project" {
@@ -106,6 +106,6 @@ setup() {
 
     # to test, echo the value that we got and see if it what we wanted
     run jq .Measurements.PCR0 $BATS_TEST_TMPDIR/assets/eif-description.json
-    assert_output --partial $want
+    assert_output --partial "$want"
 }
 
