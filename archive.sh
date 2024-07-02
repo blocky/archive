@@ -108,7 +108,7 @@ function sub_package() {
     done
 
     # render the more interesting templates
-    sed -e "s/{{CMD}}/$cmd" ./templates/Makefile.mustache > "$staging_dir/Makefile"
+    sed -e "s/{{CMD}}/$cmd/" ./templates/Makefile.mustache > "$staging_dir/Makefile"
 
     # copy the source code
     local ext=$(echo "${src##*.}")
