@@ -117,7 +117,7 @@ development by starting a `nix-shell`, updating the script and developing the
 script in the `nix-shell`.  For example
 
 ```bash
-nix-shell --pure -p bash docker mustache-go nix
+nix-shell --pure -p bash docker mustache-go nix jq
 ```
 
 And then go to `archive.sh` add a "normal" bash shebang. That is, apply the
