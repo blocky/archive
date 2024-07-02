@@ -15,16 +15,16 @@ function sub_help() {
     echo "    -u, --unsafe  Allow running on an unsupported platform."
     echo ""
     echo "Subcommands:"
-    echo "    help        Display the help message."
-    echo "    package     Package for building for enclaves."
-    echo "    go-proj     Archive a vendored go project maintained by git."
-    echo "    repro-tar   tar with flags set for creating archives reproducibly."
-    echo "                Additional options are passed through to the tar command."
-    echo "    repro-gzip  gzip with flags set for compressing archives reproducibly."
-    echo "                Additional options are passed through to the tar command."
+    echo "    help              Display the help message."
+    echo "    package           Package for building for enclaves."
+    echo "    go-proj           Archive a vendored go project maintained by git."
+    echo "    reproducible-tar  tar with flags set for creating archives reproducibly."
+    echo "                      Additional options are passed through to the tar command."
+    echo "    reproducible-gzip gzip with flags set for compressing archives reproducibly."
+    echo "                      Additional options are passed through to the tar command."
 }
 
-function sub_repro-tar() {
+function sub_reproducible-tar() {
     # SOURCE_DATE_EPOCH is a standard environment variable
     # for reproducible builds to use as a build time.
     # for more on this environment variable see:
@@ -52,7 +52,7 @@ function sub_repro-tar() {
         $@
 }
 
-function sub_repro-gzip() {
+function sub_reproducible-gzip() {
     # A set of arguments for gzip that will create reproducible zips.
     # For more on what these do and how they work see:
     #   https://www.gnu.org/software/tar/manual/html_node/Reproducibility.html
@@ -71,14 +71,14 @@ function sub_go-proj() {
     local proj_name=$(basename $go_proj_dir)
     local root_dir=$(dirname $go_proj_dir)
 
-    ./archive.sh repro-tar \
+    ./archive.sh reproducible-tar \
             -C "$root_dir" \
             --exclude-vcs \
             --exclude-vcs-ignores \
             -c \
             "./$proj_name" \
             "./$proj_name/vendor" |
-        ./archive.sh repro-gzip -c --best
+        ./archive.sh reproducible-gzip -c --best
 }
 
 function sub_package() {
@@ -118,8 +118,8 @@ function sub_package() {
     chmod -R 644 $staging_dir/*
 
     # create the archive
-    sub_repro-tar -c -C "$tmp_dir" "$root_dir_name" | \
-        sub_repro-gzip -c --best > "$tmp_dir/$root_dir_name.tar.gz"
+    sub_reproducible-tar -c -C "$tmp_dir" "$root_dir_name" | \
+        sub_reproducible-gzip -c --best > "$tmp_dir/$root_dir_name.tar.gz"
 
     # clean up
     rm -rf $staging_dir
