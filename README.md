@@ -75,7 +75,7 @@ Let's break this down:
 * `gateway` is the command to start the executable produced by installing the
   set-get project.  That is, it is the name of the program created by running
   `go install .` in the project directory.  You can find that info in the
-  go.mod file.
+  `go.mod` file.
 
 Once this runs, all of your assets will be in the `/tmp/set-get-assets` directory.
 
