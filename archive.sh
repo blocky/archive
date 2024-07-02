@@ -66,6 +66,13 @@ function sub_reproducible-gzip() {
 }
 
 function sub_go-proj() {
+    if [[ $# -lt 2 ]]; then
+        echo "Usage: $0 go-proj <dir>"
+        echo ""
+        echo "    dir  Path to the root directory of the Go project to be archived"
+        exit 1
+    fi
+
     local go_proj_dir=$1
 
     local proj_name=$(basename $go_proj_dir)
