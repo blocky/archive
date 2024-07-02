@@ -1,0 +1,24 @@
+build:
+	mkdir -p output
+	nix-build docker.nix \
+		--argstr cmd "{{CMD}}" \
+		--arg src ./src.tgz \
+		--argstr imageName archive-package \
+		--argstr tagName latest \
+		--out-link ./output/result
+	docker load < ./output/result
+	rm -f ./output/result
+	docker build --tag nitro-cli-image --file nitro-cli.dockerfile .
+	docker run --rm \
+		-v ./output:/output \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		nitro-cli-image \
+	    nitro-cli build-enclave --docker-uri archive-package:latest --output-file /output/package.eif
+	docker run --rm \
+		-v ./output:/output \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		nitro-cli-image \
+	    nitro-cli describe-eif --eif-path /output/package.eif > output/eif-description.json
+
+clean:
+	rm -rf ./output
