@@ -43,11 +43,48 @@ $ ls
 archive  set-get
 ```
 
-Next, we can run the archive command to produce a gzipped tarball of the
+Next, let's check out the help docs.
+
+```bash
+cd archvie
+./archive.sh help
+```
+
+You will be presented with the following scary message:
+
+```
+ERROR:
+    This script is designed to be run in a pure nix shell.
+    While it may work, running outside of a pure nix shell
+    may be non-reproducible.
+
+    IN_NIX_SHELL is set to ''.
+
+Aborting:
+    You are running with an unchecked configuration.
+    If you really want to run this application,
+    consider using the '--unsafe' flag.
+    For example:
+        'archive.sh --unsafe help'
+```
+
+This is because you are not running in a "pure" nix-shell, and so we do not
+know the environment in which you are running.  That can have some pretty bad
+side effects for reproducibility.  If you are okay with running
+in that way you can run the command with the `--unsafe` flag.
+
+But, it is way better to run in a nix shell.  To get started, run:
+
+```bash
+nix-shell --pure
+```
+
+The shell will be created using the environment specified in the `shell.nix`
+
+Next, let's run the archive command to produce a gzipped tarball of the
 set-get project.
 
 ```bash
-cd archive
 ./archive.sh go-proj ../set-get > /tmp/set-get-src.tgz
 ```
 
@@ -108,28 +145,4 @@ You can run the tests with
 
 ```bash
 make test
-```
-
-You will likely observe that starting the application is kind of slow.  This is
-because each run of the `archive.sh` script will start a `nix-shell`.  There is
-likely a better way, but at least one thing that helps is you can speed up
-development by starting a `nix-shell`, updating the script and developing the
-script in the `nix-shell`.  For example
-
-```bash
-nix-shell --pure -p bash docker mustache-go nix jq
-```
-
-And then go to `archive.sh` add a "normal" bash shebang. That is, apply the
-following patch (just make sure to remove it before committing):
-
-```
---- a/archive.sh
-+++ b/archive.sh
-@@ -1,3 +1,5 @@
-+#!/usr/bin/env bash
-+
- #!/usr/bin/env nix-shell
- #! nix-shell -i bash --pure
- #! nix-shell -p bash mustache-go nix cacert docker
 ```
