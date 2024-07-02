@@ -129,7 +129,7 @@ following patch (just make sure to remove it before committing):
 @@ -1,3 +1,5 @@
 +#!/usr/bin/env bash
 +
-#!/usr/bin/env nix-shell
-#! nix-shell -i bash --pure
-#! nix-shell -p bash mustache-go nix cacert docker
+ #!/usr/bin/env nix-shell
+ #! nix-shell -i bash --pure
+ #! nix-shell -p bash mustache-go nix cacert docker
 ```
