@@ -79,7 +79,7 @@ Let's break this down:
 
 Once this runs, all of your assets will be in the `/tmp/set-get-assets` directory.
 
-And for the big finish, you can "verify" this archive as follows:
+And for the big finish, you can measure this archive as follows:
 
 ```bash
 cd /tmp/set-get-assets
