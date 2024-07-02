@@ -8,8 +8,7 @@ in
   version = "v0.0.0";
 
   # this is the path to the thing we are going to build.
-  # For now, this is a relative path, however, it
-  # will likely be:
+  # For now, this is a relative path that we pass in to the derivation
   src = pkgSrc;
 
   # This value can be the hash of the vendor library or null
