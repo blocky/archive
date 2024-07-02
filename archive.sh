@@ -59,7 +59,8 @@ function sub_repro-gzip() {
     #
     # One difference is that here, we do not set LC_ALL=C. From what I
     # understand, since nix controls the locals it should not be set by the
-    # command.
+    # command.  The other difference is that we do not use `--best`.
+    # We leave the compression level to the user.
     gzip --no-name $@
 }
 
