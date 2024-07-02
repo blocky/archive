@@ -1,6 +1,6 @@
 #!/usr/bin/env nix-shell
 #! nix-shell -i bash --pure
-#! nix-shell -p bash mustache-go nix cacert docker
+#! nix-shell -p bash nix cacert docker
 #! nix-shell -I nixpkgs=https://github.com/NixOS/nixpkgs/tarball/nixos-24.05
 
 set -e
@@ -108,7 +108,7 @@ function sub_package() {
     done
 
     # render the more interesting templates
-    echo CMD: "$cmd" | mustache ./templates/Makefile.mustache > "$staging_dir/Makefile"
+    sed -e "s/{{CMD}}/$cmd" ./templates/Makefile.mustache > "$staging_dir/Makefile"
 
     # copy the source code
     local ext=$(echo "${src##*.}")
