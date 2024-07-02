@@ -194,7 +194,7 @@ function check_platform() {
 
 function main() {
     # General structure for handling bash subscommands
-    # was prposed by waylan in the following gist:
+    # was proposed by waylan in the following gist:
     # https://gist.github.com/waylan/4080362
     app_name=$(basename $0)
 
