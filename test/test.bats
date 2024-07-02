@@ -14,7 +14,7 @@ setup() {
 @test "happy path - expected hash of archive does not change" {
     # the expected hash came from running:
     #
-    #   ./archive.sh repro-tar -C ./test/test_data/ --exclude-vcs --exclude-vcs-ignores -c ./go_proj/ ./go_proj/vendor | md5sum
+    #   ./archive.sh reproducible-tar -C ./test/test_data/ --exclude-vcs --exclude-vcs-ignores -c ./go_proj/ ./go_proj/vendor | md5sum
     #
     # Yes, it does assume that the code is correct.  However, here we are more
     # concerned with the value changing when building on different systems and
@@ -22,7 +22,7 @@ setup() {
     # indicates there is a problem with some build tool.
     local want="33c31dfa677be99a4a1fac34b69d2075"
 
-    got=$(./archive.sh repro-tar \
+    got=$(./archive.sh reproducible-tar \
         `# use the test data directory as the base directory` \
         -C ./test/test_data/ \
         `# exclude the .git and other git related files, e.g. .gitignore` \
@@ -45,7 +45,7 @@ setup() {
 @test "happy path - expected hash of zipfile does not change" {
     # the expected hash came from running:
     #
-    #   ./archive.sh repro-gzip --best -c ./test/test_data/go_proj/main.go | md5sum
+    #   ./archive.sh reproducible-gzip --best -c ./test/test_data/go_proj/main.go | md5sum
     #
     # Yes, it does assume that the code is correct.  However, here we are more
     # concerned with the value changing when building on different systems and
@@ -53,7 +53,7 @@ setup() {
     # indicates there is a problem with some build tool.
     local want="df33befa3b10692f45a5860889afa633"
 
-    got=$(./archive.sh repro-gzip \
+    got=$(./archive.sh reproducible-gzip \
         `# use the best compression at the expense of time to compress` \
         --best \
         `# write the output to stdout` \
