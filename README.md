@@ -54,7 +54,7 @@ cd archive
 Let's break this down:
 
 * `./archive.sh go-proj` runs the subcommand
-* `../set-get` is the path to the `set-get` project > /tmp/set-get-src.tgz
+* `../set-get` is the path to the `set-get` project
 * `> /tmp/set-get-src.tgz` outputs the gzipped tarball to `/tmp/set-get-src.tgz`
 
 Now that we have an archive, we can use the other command to create a package
