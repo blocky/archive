@@ -46,7 +46,7 @@ archive  set-get
 Next, let's check out the help docs.
 
 ```bash
-cd archvie
+cd archive
 ./archive.sh help
 ```
 
@@ -68,7 +68,7 @@ Aborting:
         'archive.sh --unsafe help'
 ```
 
-This is because you are not running in a "pure" nix-shell, and so we do not
+This error appears because you are not running in a "pure" nix-shell, and so we do not
 know the environment in which you are running.  That can have some pretty bad
 side effects for reproducibility.  If you are okay with running
 in that way you can run the command with the `--unsafe` flag.
