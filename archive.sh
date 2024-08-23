@@ -112,7 +112,7 @@ function sub_package() {
 
     # Append the remaining arguments to the Nix list, quoting each one
     for arg in "$@"; do
-      cmd_list="$cmd_list, \"$arg\""
+      cmd_list="$cmd_list \"$arg\""
     done
 
     # Close the Nix list with a closing bracket
