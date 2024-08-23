@@ -103,7 +103,23 @@ function sub_package() {
     local src=$2
     local root_dir_name=$3
     shift 3
-    local cmd=$@
+
+    # Now, the remaining arguments are the command and its arguments
+    cmd_list="[ \"$1\""
+
+    # Shift the first command argument
+    shift
+
+    # Append the remaining arguments to the Nix list, quoting each one
+    for arg in "$@"; do
+      cmd_list="$cmd_list, \"$arg\""
+    done
+
+    # Close the Nix list with a closing bracket
+    cmd_list="$cmd_list ]"
+
+    # Print the formatted output
+    echo "$cmd_list"
 
     local tmp_dir=$(mktemp -d -t archive-package.XXXXXX)
     local staging_dir="$tmp_dir/$root_dir_name"
@@ -114,8 +130,9 @@ function sub_package() {
         install -D "./templates/$f" "$staging_dir/$f"
     done
 
-    # render the more interesting templates
-    sed -e "s/{{CMD}}/$cmd/" ./templates/Makefile.mustache > "$staging_dir/Makefile"
+    # Use `sed` to inject the value of `cmd_list` into the mustache template
+    # Wrap the entire list in single quotes
+    sed -e "s|{{CMD}}|'$cmd_list'|" ./templates/Makefile.mustache > "$staging_dir/Makefile"
 
     # copy the source code
     local ext=$(echo "${src##*.}")

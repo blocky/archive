@@ -3,7 +3,12 @@ let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-24.05";
   pkgs = import nixpkgs { config = {}; overlays = []; };
   aPkg = import ./go.nix { pkgs = pkgs; src = src; };
-  cmdFromPkg = aPkg + "/bin/" + cmd;
+  cmdFromPkg = aPkg + "/bin/" + builtins.head cmd;
+  cmdTail = builtins.tail cmd;
+  cmdConfig = if builtins.length cmdTail > 0 then
+    [ "${cmdFromPkg}" ] ++ cmdTail
+  else
+    [ "${cmdFromPkg}" ];
 in
 pkgs.dockerTools.buildImage {
     name = "${imageName}";
@@ -11,6 +16,6 @@ pkgs.dockerTools.buildImage {
     copyToRoot = [ aPkg ];
 
     config = {
-        Cmd = [ "${cmdFromPkg}" ];
+        Cmd = cmdConfig;
     };
 }
