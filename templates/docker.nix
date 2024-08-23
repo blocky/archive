@@ -4,11 +4,13 @@ let
   pkgs = import nixpkgs { config = {}; overlays = []; };
   aPkg = import ./go.nix { pkgs = pkgs; src = src; };
   cmdFromPkg = aPkg + "/bin/" + builtins.head cmd;
+
   cmdTail = builtins.tail cmd;
   cmdConfig = if builtins.length cmdTail > 0 then
     [ "${cmdFromPkg}" ] ++ cmdTail
   else
     [ "${cmdFromPkg}" ];
+
 in
 pkgs.dockerTools.buildImage {
     name = "${imageName}";
