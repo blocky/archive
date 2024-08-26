@@ -1,7 +1,7 @@
 build:
 	mkdir -p output
 	nix-build docker.nix \
-		--arg cmd {{CMD}} \
+		--arg cmd "{{CMD}}" \
 		--arg src ./src.tgz \
 		--argstr imageName archive-package \
 		--argstr tagName latest \
