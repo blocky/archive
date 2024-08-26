@@ -16,7 +16,7 @@ let
   else
   # Prefix the executable command (first element in the cmd list) with the
   # executable path, then append the rest of the cmd list
-    [ (aPkg + "/bin/" + builtins.elemAt cmd 0) ] ++ builtins.tail cmd;
+    [ (aPkg + "/bin/" + builtins.head cmd) ] ++ builtins.tail cmd;
 
 in pkgs.dockerTools.buildImage {
   name = "${imageName}";
