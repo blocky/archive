@@ -77,7 +77,7 @@ Let's break this down:
   `go install .` in the project directory.  You can find that info in the
   `go.mod` file. Any additional arguments included in this string, 
   separated by spaces, are assumed to be arguments to the command, e.g.
-  `"gateway --log-level=debug"`.
+  `"gateway arg1 --flag=value arg2"`.
 
 Once this runs, all of your assets will be in the `/tmp/set-get-assets` directory.
 
