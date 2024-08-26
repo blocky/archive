@@ -110,11 +110,11 @@ function sub_package() {
     # list to pass to the build script. e.g.
     # "cmd arg1 --flag=value ..." --> "[ \"cmd\" \"arg1\" \"--flag=value\" ... ]"
     read -r -a cmd_array <<< "$cmd"
-    nix_cmd_list='\"[ '
+    nix_cmd_list='[ '
     for element in "${cmd_array[@]}"; do
         nix_cmd_list+='\\\"'"$element"'\\\" '
     done
-    nix_cmd_list+=']\"'
+    nix_cmd_list+=']'
 
     local tmp_dir=$(mktemp -d -t archive-package.XXXXXX)
     local staging_dir="$tmp_dir/$root_dir_name"
