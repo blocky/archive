@@ -108,11 +108,11 @@ function sub_package() {
     # We assume that the last argument is a string containing the command to run
     # the binary and any arguments. We need to convert this into a Nix-syntax
     # list to pass to the build script. e.g.
-    # "cmd arg1 --flag=value arg2 ..." --> [ "cmd" "arg1" "--flag=value" "arg2" ... ]
+    # "cmd arg1 --flag=value ..." --> "[ \"cmd\" \"arg1\" \"--flag=value\" ... ]"
     read -r -a cmd_array <<< "$cmd"
     nix_cmd_list="[ "
     for element in "${cmd_array[@]}"; do
-        nix_cmd_list+="\"$element\" "
+        nix_cmd_list+="\\\"$element\\\" "
     done
     nix_cmd_list+="]"
 
