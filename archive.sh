@@ -95,7 +95,7 @@ function sub_package() {
         echo "    dst  Output directory. We assume it does not already exist"
         echo "    src  Source archive (created with go-proj subcommand)"
         echo "    name Name of the project"
-        echo "    cmd  Name of the program created by the project"
+        echo "    cmd  Command to run the binary, including arguments separated by spaces"
         exit 1
     fi
 
@@ -104,6 +104,17 @@ function sub_package() {
     local root_dir_name=$3
     shift 3
     local cmd=$@
+
+    # We assume that the last argument is a string containing the command to run
+    # the binary and any arguments. We need to convert this into a Nix-syntax
+    # list to pass to the build script. e.g.
+    # "cmd arg1 --flag=value ..." --> "[ \"cmd\" \"arg1\" \"--flag=value\" ... ]"
+    read -r -a cmd_array <<< "$cmd"
+    nix_cmd_list='[ '
+    for element in "${cmd_array[@]}"; do
+        nix_cmd_list+='\\\"'"$element"'\\\" '
+    done
+    nix_cmd_list+=']'
 
     local tmp_dir=$(mktemp -d -t archive-package.XXXXXX)
     local staging_dir="$tmp_dir/$root_dir_name"
@@ -115,7 +126,7 @@ function sub_package() {
     done
 
     # render the more interesting templates
-    sed -e "s/{{CMD}}/$cmd/" ./templates/Makefile.mustache > "$staging_dir/Makefile"
+    sed -e "s/{{CMD}}/$nix_cmd_list/" ./templates/Makefile.mustache > "$staging_dir/Makefile"
 
     # copy the source code
     local ext=$(echo "${src##*.}")
