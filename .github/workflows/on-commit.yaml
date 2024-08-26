@@ -11,6 +11,11 @@ jobs:
       - name: Checkout self
         uses: actions/checkout@v4
 
+      - name: Setup Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-24.05
+
       - name: Run tests
         run: |
           git submodule update --init
