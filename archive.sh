@@ -95,7 +95,7 @@ function sub_package() {
         echo "    dst  Output directory. We assume it does not already exist"
         echo "    src  Source archive (created with go-proj subcommand)"
         echo "    name Name of the project"
-        echo "    cmd  Command to run the binary with arguments"
+        echo "    cmd  Command to run the binary, including arguments separated by spaces"
         exit 1
     fi
 
