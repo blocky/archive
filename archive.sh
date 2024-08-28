@@ -75,6 +75,11 @@ function sub_go-proj() {
 
     local go_proj_dir=$1
 
+    if [[ -z "$go_proj_dir" ]]; then
+        echo "Error: The argument <dir> cannot be empty."
+        exit 1
+    fi
+
     local proj_name=$(basename $go_proj_dir)
     local root_dir=$(dirname $go_proj_dir)
 
@@ -104,6 +109,12 @@ function sub_package() {
     local root_dir_name=$3
     shift 3
     local cmd=$@
+
+    # Check for empty string arguments
+    if [[ -z "$dst" || -z "$src" || -z "$root_dir_name" || -z "$cmd" ]]; then
+        echo "Error: None of the arguments <dst>, <src>, <name>, or <cmd> can be empty."
+        exit 1
+    fi
 
     # We assume that the last argument is a string containing the command to run
     # the binary and any arguments. We need to convert this into a Nix-syntax
