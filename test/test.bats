@@ -11,6 +11,30 @@ setup() {
     PATH="$DIR/..:$PATH"
 }
 
+@test "error path - not enough arguments archiving project" {
+    run ./archive.sh go-proj
+    assert_failure
+    assert_output --partial "Usage: $0 go-proj <dir>"
+}
+
+@test "error path - empty arguments not allowed archiving project" {
+    run ./archive.sh go-proj ''
+    assert_failure
+    assert_output --partial "Usage: $0 go-proj <dir>"
+}
+
+@test "error path - not enough arguments packaging project" {
+    run ./archive.sh package arg1 arg2 arg3
+    assert_failure
+    assert_output --partial "Usage: $0 go-proj <dir>"
+}
+
+@test "error path - empty arguments not allowed packaging project" {
+    run ./archive.sh package arg1 arg2 arg3 ''
+    assert_failure
+    assert_output --partial "Usage: $0 go-proj <dir>"
+}
+
 @test "happy path - expected hash of archive does not change" {
     # the expected hash came from running:
     #
