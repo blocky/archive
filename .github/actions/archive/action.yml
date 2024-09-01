@@ -1,0 +1,73 @@
+name: "Archive and Package Go Project"
+description: "Archives a Go project and packages it for deployment to a Nitro Enclave."
+
+inputs:
+  source_dir:
+    description: "Directory containing the source code."
+    required: true
+  project_name:
+    description: "Name of the project."
+    required: false
+    default: ${{ github.repository }}
+  run_command:
+    description: >
+      Command to run the Go project inside the enclave. Command string must be
+      a double quoted string. Include command arguments separated by spaces. If
+      quoted arguments are needed, use single quotes within the double quotes.
+      Example: "executable-cmd arg1 --flag='some input'"
+    required: true
+  output_dir:
+    description: "Optional location to save the output files from the package command."
+    required: false
+    default: ${{ github.workspace }}/${{ github.repository }}-archive-assets
+
+outputs:
+  output_dir:
+    description: "Path to the directory containing the output files."
+
+runs:
+  using: "composite"
+  env:
+    build_dir: ${{ runner.temp }}/build-${{ github.sha }}
+    archive_tool_dir: ${{ runner.temp }}/archive-${{ github.sha }}
+
+  steps:
+    - name: Checkout archive tool repo
+      uses: actions/checkout@v4
+      with:
+        path: ${{ env.archive_tool_dir }}
+
+    - name: Debug
+      run: |
+        echo "source_dir=${{ inputs.source_dir }}"
+        echo "project_name=${{ inputs.project_name }}"
+        echo "run_command=${{ inputs.run_command }}"
+        echo "output_dir=${{ inputs.output_dir }}"
+        echo "build_dir=${{ env.build_dir }}"
+        echo "archive_tool_dir=${{ env.archive_tool_dir }}"
+        ls -la ${{ env.archive_tool_dir }}
+
+    - name: Archive the Go project
+      run: |
+        cd ${{ env.archive_tool_dir }}
+        echo "Archiving Go project from ${{ inputs.source_dir }} to ${{ env.build_dir }}/src.tar.gz"
+        ./.github/actions/archive/archive.sh go-proj \
+            "${{ inputs.source_dir }}" \
+            > "${{ env.build_dir }}/src.tar.gz"
+        echo "Archived Go project to ${{ env.build_dir }}/src.tar.gz"
+
+    - name: Package the project for Nitro Enclave
+      run: |
+        cd ${{ env.archive_tool_dir }}
+        echo "Packaging project for Nitro Enclave"
+        ./.github/actions/archive/archive.sh package \
+            "${{ inputs.output_dir }}" \
+            "${{ env.build_dir }}/src.tar.gz" \
+            "${{ inputs.project_name }}" \
+            "${{ inputs.run_command }}"
+        echo "Packaged project for Nitro Enclave"
+
+    - name: Output results
+      run: |
+        echo "output_dir=${{ inputs.output_dir }}" >> "$GITHUB_OUTPUT"
+        echo "Output directory set to ${{ inputs.output_dir }}"
