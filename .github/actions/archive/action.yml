@@ -52,7 +52,9 @@ runs:
         cd ${{ env.archive_tool_dir }}
         echo "Archiving Go project from ${{ inputs.source_dir }} to ${{ env.build_dir }}/src.tar.gz"
         ./.github/actions/archive/archive.sh go-proj \
+            # tar the code in this directory
             "${{ inputs.source_dir }}" \
+            # output the tar to this location
             > "${{ env.build_dir }}/src.tar.gz"
         echo "Archived Go project to ${{ env.build_dir }}/src.tar.gz"
 
@@ -61,9 +63,13 @@ runs:
         cd ${{ env.archive_tool_dir }}
         echo "Packaging project for Nitro Enclave"
         ./.github/actions/archive/archive.sh package \
+            # put the packaged assets here
             "${{ inputs.output_dir }}" \
+            # use this source code tar
             "${{ env.build_dir }}/src.tar.gz" \
+            # use this project name for assets
             "${{ inputs.project_name }}" \
+            # run this command to start the source executable inside the enclave 
             "${{ inputs.run_command }}"
         echo "Packaged project for Nitro Enclave"
 
