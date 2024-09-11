@@ -101,12 +101,18 @@ setup() {
 
     got=$(./archive.sh go-proj \
         `# the directory containing the go project` \
-        ./test/test_data/go_proj |
+        ./test/test_data/go_proj \
         `# compute the hash of the archive` \
         | md5sum)
 
     # to test, echo the value that we got and see if it what we wanted
     run echo "$got"
+    assert_output --partial "$want"
+
+    # and while we are at it, let's make sure that the test data is up to date.
+    # If the test data is out of date, then you will probably need to
+    # update it.  See `Makefile` for more information.
+    run md5sum ./test/test_data/go-proj-src.tgz
     assert_output --partial "$want"
 }
 
