@@ -1,7 +1,0 @@
-# golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c
-## explicit
-golang.org/x/text/internal/tag
-golang.org/x/text/language
-# rsc.io/sampler v1.99.99
-## explicit
-rsc.io/sampler
