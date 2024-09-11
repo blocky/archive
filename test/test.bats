@@ -142,7 +142,7 @@ setup() {
     # each binary.  We then run the container and check that the
     # and the docker container works as expected.
 
-    src=./test/test_data/go_proj_cmd_folders
+    src=./test/test_data/go_proj
 
     nix-build ./templates/docker.nix \
         --arg cmd '[ "app1" "1" "2"]' \
