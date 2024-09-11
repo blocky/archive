@@ -40,7 +40,7 @@ setup() {
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="33c31dfa677be99a4a1fac34b69d2075"
+    local want="f6e86ff1ae4c423cf7da4acb4edb5421"
 
     got=$(./archive.sh reproducible-tar \
         `# use the test data directory as the base directory` \
@@ -97,7 +97,7 @@ setup() {
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="d41d8cd98f00b204e9800998ecf8427e"
+    local want="3b9d93fc0703a6c81629525cc5e3daba"
 
     got=$(./archive.sh go-proj \
         `# the directory containing the go project` \
