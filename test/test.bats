@@ -40,7 +40,7 @@ setup() {
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="33c31dfa677be99a4a1fac34b69d2075"
+    local want="f6e86ff1ae4c423cf7da4acb4edb5421"
 
     got=$(./archive.sh reproducible-tar \
         `# use the test data directory as the base directory` \
@@ -97,16 +97,22 @@ setup() {
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="d41d8cd98f00b204e9800998ecf8427e"
+    local want="3b9d93fc0703a6c81629525cc5e3daba"
 
     got=$(./archive.sh go-proj \
         `# the directory containing the go project` \
-        ./test/test_data/go_proj |
+        ./test/test_data/go_proj \
         `# compute the hash of the archive` \
         | md5sum)
 
     # to test, echo the value that we got and see if it what we wanted
     run echo "$got"
+    assert_output --partial "$want"
+
+    # and while we are at it, let's make sure that the test data is up to date.
+    # If the test data is out of date, then you will probably need to
+    # update it.  See `Makefile` for more information.
+    run md5sum ./test/test_data/go-proj-src.tgz
     assert_output --partial "$want"
 }
 
@@ -120,7 +126,7 @@ setup() {
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="3071bbeafd3db708f9a29b2dc07f13c63cc591821526d3a7138a28792415d7c305d78c2d365ab086520599beb40eab1d"
+    local want="3e7c6fe6c20209276c1d7678b2afe5994044183ecca5bbb23c5635dd0f861415f8787beff5d0239d77b8ad203b33acb2"
 
     ./archive.sh package $BATS_TEST_TMPDIR/assets3Args ./test/test_data/go-proj-src.tgz go-proj "go-proj 1 2 3"
 
@@ -134,4 +140,33 @@ setup() {
     # again extract the PCR0
     run jq .Measurements.PCR0 $BATS_TEST_TMPDIR/assets5Args/eif-description.json
     refute_output --partial "$want"
+}
+
+@test "create a docker container for a multi-app project" {
+    # in this test, we check that given a go project that builds
+    # multiple binaries, we can create a docker container for
+    # each binary.  We then run the container and check that the
+    # docker container works as expected.
+
+    src=./test/test_data/go_proj
+
+    nix-build ./templates/docker.nix \
+        --arg cmd '[ "app1" "1" "2"]' \
+        --arg src "$src" \
+        --argstr imageName archive-package \
+        --argstr tagName latest \
+        --out-link $BATS_TEST_TMPDIR/output/result
+    docker load < $BATS_TEST_TMPDIR/output/result
+    run docker run --rm archive-package:latest
+    assert_output "Hello from app 1 with args '[1 2]'"
+
+    nix-build ./templates/docker.nix \
+        --arg cmd '[ "app2" "3"]' \
+        --arg src "$src" \
+        --argstr imageName archive-package \
+        --argstr tagName latest \
+        --out-link $BATS_TEST_TMPDIR/output/result
+    docker load < $BATS_TEST_TMPDIR/output/result
+    run docker run --rm archive-package:latest
+    assert_output "Hello from app 2 with args '[3]'"
 }
