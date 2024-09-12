@@ -146,7 +146,7 @@ setup() {
     # in this test, we check that given a go project that builds
     # multiple binaries, we can create a docker container for
     # each binary.  We then run the container and check that the
-    # and the docker container works as expected.
+    # docker container works as expected.
 
     src=./test/test_data/go_proj
 
