@@ -119,14 +119,14 @@ setup() {
 @test "happy path - package a go project" {
     # the expected hash came from running:
     #
-    #   ./archive.sh package /tmp/archive-package-assets ./test/test_data/go-proj-src.tgz go-proj "go-proj 1 2 3"
-    #   cat /tmp/archive-package-assets/eif-description.json
+    #   ./archive.sh package /tmp/archive-package-assets ./test/test_data/go-proj-src.tgz go-proj "go-proj 1 2 3" \
+    #       && jq .Measurements.PCR0 /tmp/archive-package-assets/eif-description.json
     #
     # Yes, it does assume that the code is correct.  However, here we are more
     # concerned with the value changing when building on different systems and
     # not the value itself. So, if we do run this test and it changes, it
     # indicates there is a problem with some build tool.
-    local want="3e7c6fe6c20209276c1d7678b2afe5994044183ecca5bbb23c5635dd0f861415f8787beff5d0239d77b8ad203b33acb2"
+    local want="4cffaeb9495c3f26b6ec3b1634a8fa2abf31d3214d66301f8c02e1141c2a4e04cba8d3e1f1a1d675fa8bd49ffa446370"
 
     ./archive.sh package $BATS_TEST_TMPDIR/assets3Args ./test/test_data/go-proj-src.tgz go-proj "go-proj 1 2 3"
 
