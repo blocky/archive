@@ -75,7 +75,7 @@ Let's break this down:
 * `gateway` is the command to start the executable produced by installing the
   set-get project.  That is, it is the name of the program created by running
   `go install .` in the project directory.  You can find that info in the
-  `go.mod` file. Any additional arguments included in this string, 
+  `go.mod` file. Any additional arguments included in this string,
   separated by spaces, are assumed to be arguments to the command, e.g.
   `"gateway arg1 --flag=value arg2"`.
 
