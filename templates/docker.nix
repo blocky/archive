@@ -40,6 +40,6 @@ let
 in pkgs.dockerTools.buildImage {
   name = "${imageName}";
   tag = "${tagName}";
-  copyToRoot = [ slimGoProj ];
+  copyToRoot = [ slimGoProj pkgs.cacert ];
   config = { Cmd = dockerCMD; };
 }
